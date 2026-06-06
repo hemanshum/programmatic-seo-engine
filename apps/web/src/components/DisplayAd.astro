@@ -1,0 +1,35 @@
+---
+// DisplayAd.astro - Google AdSense or similar display ad placeholder
+interface Props {
+  slot: string;
+  format?: 'auto' | 'rectangle' | 'leaderboard' | 'skyscraper';
+  style?: string;
+}
+
+const { slot, format = 'auto', style = '' } = Astro.props;
+const adsenseClientId = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID;
+---
+
+{adsenseClientId ? (
+  <div class="ad-container" style={`min-height: 100px; text-align: center; ${style}`}>
+    <ins
+      class="adsbygoogle"
+      style={`display: block; ${format === 'leaderboard' ? 'min-width: 728px; min-height: 90px;' : format === 'rectangle' ? 'min-width: 300px; min-height: 250px;' : ''}`}
+      data-ad-client={adsenseClientId}
+      data-ad-slot={slot}
+      data-ad-format={format}
+      data-full-width-responsive="true"
+    />
+    <script is:inline>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  </div>
+) : (
+  <div class="ad-placeholder" style={`background: #f0f0f0; border: 2px dashed #ccc; padding: 20px; text-align: center; margin: 20px 0; ${style}`}>
+    <p style="margin: 0; color: #666; font-size: 14px;">
+      🎯 Ad Placeholder: {format} ({slot})
+      <br />
+      <small>Set PUBLIC_ADSENSE_CLIENT_ID in your .env to enable ads</small>
+    </p>
+  </div>
+)}

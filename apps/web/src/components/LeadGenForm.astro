@@ -1,0 +1,88 @@
+---
+// LeadGenForm.astro - Email capture / lead generation form
+interface Props {
+  headline?: string;
+  subheadline?: string;
+  buttonText?: string;
+  offerType?: 'guide' | 'checklist' | 'calculator' | 'webinar' | 'consultation';
+  fields?: Array<'name' | 'company' | 'phone'>;
+}
+
+const {
+  headline = 'Get our free guide delivered to your inbox',
+  subheadline = 'Join 10,000+ professionals who get our weekly insights.',
+  buttonText = 'Send Me The Guide',
+  offerType = 'guide',
+  fields = [],
+} = Astro.props;
+
+const offerIcons: Record<string, string> = {
+  guide: '📖',
+  checklist: '✅',
+  calculator: '🧮',
+  webinar: '🎥',
+  consultation: '🤝',
+};
+---
+
+<div class="lead-gen-form" style="background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%); border-radius: 16px; padding: 40px; margin: 32px 0; color: white;">
+  <div style="text-align: center; max-width: 500px; margin: 0 auto;">
+    <div style="font-size: 48px; margin-bottom: 16px;">{offerIcons[offerType]}</div>
+    <h3 style="margin: 0 0 12px 0; font-size: 24px;">{headline}</h3>
+    <p style="margin: 0 0 24px 0; opacity: 0.9; font-size: 16px;">{subheadline}</p>
+
+    <form
+      action="/api/leads/capture"
+      method="POST"
+      style="display: flex; flex-direction: column; gap: 12px;"
+      onsubmit="event.preventDefault(); alert('Lead captured! Integrate with your CRM/email service.');"
+    >
+      {fields.includes('name') && (
+        <input
+          type="text"
+          name="name"
+          placeholder="Your name"
+          required
+          style="padding: 14px 16px; border-radius: 8px; border: none; font-size: 16px;"
+        />
+      )}
+
+      <input
+        type="email"
+        name="email"
+        placeholder="Enter your email address"
+        required
+        style="padding: 14px 16px; border-radius: 8px; border: none; font-size: 16px;"
+      />
+
+      {fields.includes('company') && (
+        <input
+          type="text"
+          name="company"
+          placeholder="Company name"
+          style="padding: 14px 16px; border-radius: 8px; border: none; font-size: 16px;"
+        />
+      )}
+
+      {fields.includes('phone') && (
+        <input
+          type="tel"
+          name="phone"
+          placeholder="Phone number"
+          style="padding: 14px 16px; border-radius: 8px; border: none; font-size: 16px;"
+        />
+      )}
+
+      <button
+        type="submit"
+        style="padding: 14px 24px; border-radius: 8px; border: none; background: #f59e0b; color: #1e3a5f; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 8px;"
+      >
+        {buttonText}
+      </button>
+    </form>
+
+    <p style="font-size: 12px; opacity: 0.6; margin-top: 16px;">
+      We respect your privacy. Unsubscribe at any time.
+    </p>
+  </div>
+</div>

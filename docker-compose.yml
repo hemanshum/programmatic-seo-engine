@@ -1,0 +1,35 @@
+services:
+  cms:
+    build:
+      context: ./apps/cms
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - PAYLOAD_SECRET=${PAYLOAD_SECRET:-change-me-in-production}
+      - DATABASE_URI=${DATABASE_URI:-file:./payload.sqlite}
+      - PAYLOAD_PUBLIC_SERVER_URL=${PAYLOAD_PUBLIC_SERVER_URL:-http://localhost:3001}
+      - PAYLOAD_PUBLIC_WEB_URL=${PAYLOAD_PUBLIC_WEB_URL:-http://localhost:4321}
+    volumes:
+      - cms-media:/app/media
+      - cms-db:/app/payload.sqlite
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    ports:
+      - "4321:4321"
+    environment:
+      - CMS_URL=${CMS_URL:-http://cms:3001}
+      - PUBLIC_ADSENSE_CLIENT_ID=${PUBLIC_ADSENSE_CLIENT_ID}
+      - SITE=${SITE:-http://localhost:4321}
+    depends_on:
+      - cms
+    restart: unless-stopped
+
+volumes:
+  cms-media:
+  cms-db:

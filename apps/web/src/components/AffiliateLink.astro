@@ -1,0 +1,67 @@
+---
+// AffiliateLink.astro - Styled affiliate product link
+interface Props {
+  productName: string;
+  affiliateUrl: string;
+  ctaText?: string;
+  price?: string;
+  rating?: number;
+  image?: string;
+  featured?: boolean;
+}
+
+const {
+  productName,
+  affiliateUrl,
+  ctaText = 'Check Price',
+  price,
+  rating,
+  image,
+  featured = false,
+} = Astro.props;
+---
+
+{featured ? (
+  <div class="affiliate-card featured" style="border: 2px solid #2563eb; border-radius: 12px; padding: 20px; margin: 20px 0; background: #eff6ff;">
+    <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+      {image && <img src={image} alt={productName} style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;" />}
+      <div style="flex: 1;">
+        <div style="display: inline-block; background: #2563eb; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-bottom: 8px;">TOP PICK</div>
+        <h3 style="margin: 0 0 8px 0;">{productName}</h3>
+        {rating && (
+          <div style="color: #f59e0b; margin-bottom: 8px;">
+            {'★'.repeat(Math.floor(rating))}{'☆'.repeat(5 - Math.floor(rating))}
+            <span style="color: #666; margin-left: 8px;">{rating}/5</span>
+          </div>
+        )}
+        {price && <p style="font-size: 24px; font-weight: bold; margin: 8px 0; color: #059669;">{price}</p>}
+      </div>
+      <a
+        href={affiliateUrl}
+        target="_blank"
+        rel="sponsored noopener noreferrer"
+        style="display: inline-block; background: #059669; color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: bold; white-space: nowrap;"
+      >
+        {ctaText} →
+      </a>
+    </div>
+    <p style="font-size: 11px; color: #666; margin: 12px 0 0 0;">We earn a commission if you make a purchase, at no additional cost to you.</p>
+  </div>
+) : (
+  <div class="affiliate-card" style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin: 16px 0; display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+    {image && <img src={image} alt={productName} style="width: 80px; height: 80px; object-fit: cover; border-radius: 6px;" />}
+    <div style="flex: 1;">
+      <h4 style="margin: 0 0 4px 0;">{productName}</h4>
+      {rating && <span style="color: #f59e0b; font-size: 14px;">{'★'.repeat(Math.floor(rating))}</span>}
+      {price && <span style="font-weight: bold; color: #059669; margin-left: 8px;">{price}</span>}
+    </div>
+    <a
+      href={affiliateUrl}
+      target="_blank"
+      rel="sponsored noopener noreferrer"
+      style="display: inline-block; background: #2563eb; color: white; padding: 10px 24px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 14px;"
+    >
+      {ctaText}
+    </a>
+  </div>
+)}

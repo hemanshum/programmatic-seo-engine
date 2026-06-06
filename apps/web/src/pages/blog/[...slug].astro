@@ -1,0 +1,73 @@
+---
+// Blog post page - dynamically loads from CMS or local content
+import { type CollectionEntry, getCollection } from 'astro:content';
+import BlogPost from '../../layouts/BlogPost.astro';
+import { getArticleBySlug } from '../../lib/cms';
+import { Image } from 'astro:assets';
+
+export async function getStaticPaths() {
+  // Try CMS first
+  try {
+    const res = await fetch('http://localhost:3001/api/articles?limit=1000&where={"status":{"equals":"published"}}');
+    if (res.ok) {
+      const data = await res.json();
+      if (data.docs?.length > 0) {
+        return data.docs.map((article: any) => ({
+          params: { slug: article.slug },
+          props: { source: 'cms', article },
+        }));
+      }
+    }
+  } catch {
+    // CMS not available, fallback to local
+  }
+
+  // Fallback to local content
+  const posts = await getCollection('blog');
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { source: 'local', post },
+  }));
+}
+
+interface Props {
+  source: 'cms' | 'local';
+  article?: any;
+  post?: CollectionEntry<'blog'>;
+}
+
+const { source, article, post } = Astro.props;
+
+let pageData: any;
+if (source === 'cms' && article) {
+  pageData = {
+    title: article.title,
+    description: article.excerpt || article.metaDescription || '',
+    pubDate: new Date(article.publishedDate),
+    updatedDate: article.updatedAt ? new Date(article.updatedAt) : undefined,
+    heroImage: article.featuredImage?.url || '/blog-placeholder-about.jpg',
+    affiliateLinks: article.monetization?.affiliateLinks || [],
+    displayAdSlots: article.monetization?.displayAdSlots || ['above-content', 'inline-p3', 'below-content'],
+    leadGenForm: article.monetization?.leadGenForm || false,
+    leadGenHeadline: article.monetization?.leadGenHeadline,
+    slug: article.slug,
+    readingTime: article.readingTime || 5,
+    content: article.content,
+  };
+} else if (post) {
+  const { Content } = await post.render();
+  pageData = {
+    ...post.data,
+    content: Content,
+    slug: post.slug,
+  };
+}
+---
+
+<BlogPost {...pageData}>
+  {source === 'cms' ? (
+    <div set:html={typeof pageData.content === 'string' ? pageData.content : JSON.stringify(pageData.content)} />
+  ) : (
+    <pageData.content />
+  )}
+</BlogPost>

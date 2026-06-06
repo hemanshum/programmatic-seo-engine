@@ -1,0 +1,186 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import { getCollection } from 'astro:content';
+import FormattedDate from '../components/FormattedDate.astro';
+import { getArticles, getCategories } from '../lib/cms';
+
+// Fetch articles from CMS or fallback to local
+let articles: any[] = [];
+try {
+  const cmsData = await getArticles(12);
+  articles = cmsData.docs || [];
+} catch {
+  const localPosts = await getCollection('blog');
+  articles = localPosts.map(p => ({
+    title: p.data.title,
+    slug: p.slug,
+    excerpt: p.data.description,
+    publishedDate: p.data.pubDate,
+    featuredImage: p.data.heroImage,
+  }));
+}
+
+let categories: any[] = [];
+try {
+  const catData = await getCategories();
+  categories = catData.docs || [];
+} catch {
+  categories = [];
+}
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<style>
+			main {
+				width: 960px;
+			}
+			ul {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 2rem;
+				list-style-type: none;
+				margin: 0;
+				padding: 0;
+			}
+			ul li {
+				width: calc(50% - 1rem);
+			}
+			ul li * {
+				text-decoration: none;
+				transition: 0.2s ease;
+			}
+			ul li:first-child {
+				width: 100%;
+				margin-bottom: 1rem;
+				text-align: center;
+			}
+			ul li:first-child img {
+				width: 100%;
+			}
+			ul li:first-child .title {
+				font-size: 2.369rem;
+			}
+			ul li img {
+				margin-bottom: 0.5rem;
+				border-radius: 12px;
+			}
+			ul li a {
+				display: block;
+			}
+			.title {
+				margin: 0;
+				color: rgb(var(--black));
+				line-height: 1;
+			}
+			.date {
+				margin: 0;
+				color: rgb(var(--gray));
+			}
+			ul li a:hover h4,
+			ul li a:hover .date {
+				color: rgb(var(--accent));
+			}
+			ul a:hover img {
+				box-shadow: var(--box-shadow);
+			}
+			@media (max-width: 720px) {
+				ul {
+					gap: 0.5em;
+				}
+				ul li {
+					width: 100%;
+					text-align: center;
+				}
+				ul li:first-child {
+					margin-bottom: 0;
+				}
+				ul li:first-child .title {
+					font-size: 1.563em;
+				}
+			}
+
+			.categories {
+				display: flex;
+				gap: 12px;
+				flex-wrap: wrap;
+				margin: 20px 0;
+				justify-content: center;
+			}
+			.category-badge {
+				background: #f3f4f6;
+				padding: 8px 16px;
+				border-radius: 20px;
+				text-decoration: none;
+				color: #374151;
+				font-size: 14px;
+				font-weight: 500;
+			}
+			.category-badge:hover {
+				background: #2563eb;
+				color: white;
+			}
+
+			.hero {
+				text-align: center;
+				padding: 60px 20px;
+				background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+				color: white;
+				border-radius: 16px;
+				margin-bottom: 40px;
+			}
+			.hero h1 {
+				margin: 0 0 16px 0;
+				font-size: 3rem;
+			}
+			.hero p {
+				margin: 0;
+				font-size: 1.25rem;
+				opacity: 0.9;
+				max-width: 600px;
+				margin: 0 auto;
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<div class="hero">
+				<h1>{SITE_TITLE}</h1>
+				<p>{SITE_DESCRIPTION}</p>
+			</div>
+
+			{categories.length > 0 && (
+				<div class="categories">
+					{categories.map((cat) => (
+						<a href={`/category/${cat.slug}`} class="category-badge">{cat.name}</a>
+					))}
+				</div>
+			)}
+
+			<section>
+				<h2>Latest Articles</h2>
+				<ul>
+					{articles.map((article) => (
+						<li>
+							<a href={`/blog/${article.slug}`}>
+								<img width={720} height={360} src={article.featuredImage || '/blog-placeholder-3.jpg'} alt="" />
+								<h4 class="title">{article.title}</h4>
+								<p class="date">
+									<FormattedDate date={new Date(article.publishedDate)} />
+								</p>
+								<p style="color: #666; margin-top: 8px;">{article.excerpt?.substring(0, 120)}...</p>
+							</a>
+						</li>
+					))}
+				</ul>
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>

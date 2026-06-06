@@ -1,0 +1,230 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import DisplayAd from '../components/DisplayAd.astro';
+import AffiliateLink from '../components/AffiliateLink.astro';
+import LeadGenForm from '../components/LeadGenForm.astro';
+
+type Props = CollectionEntry<'blog'>['data'] & {
+  body?: string;
+  affiliateLinks?: Array<{
+    productName: string;
+    affiliateUrl: string;
+    ctaText?: string;
+    priority?: number;
+  }>;
+  displayAdSlots?: string[];
+  leadGenForm?: boolean;
+  leadGenHeadline?: string;
+  slug?: string;
+  readingTime?: number;
+};
+
+const {
+  title,
+  description,
+  pubDate,
+  updatedDate,
+  heroImage,
+  affiliateLinks = [],
+  displayAdSlots = [],
+  leadGenForm = false,
+  leadGenHeadline,
+  slug,
+  readingTime = 5,
+} = Astro.props;
+
+const canonicalUrl = slug ? `${Astro.site}blog/${slug}` : undefined;
+const adsenseClientId = import.meta.env.PUBLIC_ADSENSE_CLIENT_ID;
+---
+
+<html lang="en">
+	<head>
+		<BaseHead
+			title={title}
+			description={description}
+			image={heroImage}
+			canonicalUrl={canonicalUrl}
+			article={{
+				publishedDate: pubDate?.toISOString(),
+				modifiedDate: updatedDate?.toISOString(),
+				readingTime,
+			}}
+			adsenseClientId={adsenseClientId}
+		/>
+		<style>
+			main {
+				width: calc(100% - 2em);
+				max-width: 100%;
+				margin: 0;
+			}
+			.hero-image {
+				width: 100%;
+			}
+			.hero-image img {
+				display: block;
+				margin: 0 auto;
+				border-radius: 12px;
+				box-shadow: var(--box-shadow);
+			}
+			.prose {
+				width: 720px;
+				max-width: calc(100% - 2em);
+				margin: auto;
+				padding: 1em;
+				color: rgb(var(--gray-dark));
+			}
+			.title {
+				margin-bottom: 1em;
+				padding: 1em 0;
+				text-align: center;
+				line-height: 1;
+			}
+			.title h1 {
+				margin: 0 0 0.5em 0;
+			}
+			.date {
+				margin-bottom: 0.5em;
+				color: rgb(var(--gray));
+			}
+			.last-updated-on {
+				font-style: italic;
+			}
+			.content-wrapper {
+				display: grid;
+				grid-template-columns: 1fr 300px;
+				gap: 40px;
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 0 1em;
+			}
+			.sidebar {
+				display: none;
+			}
+			@media (min-width: 1024px) {
+				.content-wrapper {
+					grid-template-columns: 1fr 300px;
+				}
+				.sidebar {
+					display: block;
+				}
+			}
+			.toc {
+				position: sticky;
+				top: 100px;
+				background: #f9fafb;
+				padding: 20px;
+				border-radius: 12px;
+			}
+			.toc h3 {
+				margin: 0 0 12px 0;
+				font-size: 16px;
+			}
+			.toc ul {
+				list-style: none;
+				padding: 0;
+				margin: 0;
+			}
+			.toc li {
+				margin: 8px 0;
+			}
+			.toc a {
+				color: #374151;
+				text-decoration: none;
+				font-size: 14px;
+			}
+			.toc a:hover {
+				color: #2563eb;
+			}
+		</style>
+	</head>
+
+	<body>
+		<Header />
+		<main>
+			<article>
+				<div class="hero-image">
+					{heroImage && <img width={1020} height={510} src={heroImage} alt="" />}
+				</div>
+				<div class="title">
+					<div class="date">
+						<FormattedDate date={pubDate} />
+						{updatedDate && (
+							<div class="last-updated-on">
+								Last updated on <FormattedDate date={updatedDate} />
+							</div>
+						)}
+						{readingTime && <span> · {readingTime} min read</span>}
+					</div>
+					<h1>{title}</h1>
+					<p>{description}</p>
+				</div>
+
+				{displayAdSlots.includes('above-content') && (
+					<DisplayAd slot="above-content" format="leaderboard" />
+				)}
+
+				<div class="content-wrapper">
+					<div class="prose">
+						<slot />
+
+						<!-- Inline Affiliate Links (after ~3rd paragraph) -->
+						{affiliateLinks.length > 0 && (
+							<div class="affiliate-section">
+								<h3>Recommended for You</h3>
+								{affiliateLinks
+									.sort((a, b) => (a.priority || 1) - (b.priority || 1))
+									.map((link) => (
+										<AffiliateLink {...link} />
+									))}
+							</div>
+						)}
+
+						{displayAdSlots.includes('inline-p3') && (
+							<DisplayAd slot="inline-p3" format="rectangle" />
+						)}
+
+						{leadGenForm && (
+							<LeadGenForm
+								headline={leadGenHeadline}
+								offerType="guide"
+							/>
+						)}
+
+						{displayAdSlots.includes('below-content') && (
+							<DisplayAd slot="below-content" format="auto" />
+						)}
+					</div>
+
+					<aside class="sidebar">
+						{displayAdSlots.includes('sidebar') && (
+							<DisplayAd slot="sidebar" format="skyscraper" />
+						)}
+
+						<div class="toc">
+							<h3>Table of Contents</h3>
+							<ul>
+								<li><a href="#">Introduction</a></li>
+								<li><a href="#">Key Features</a></li>
+								<li><a href="#">Comparison</a></li>
+								<li><a href="#">FAQ</a></li>
+							</ul>
+						</div>
+
+						<LeadGenForm
+							headline="Never miss an update"
+							subheadline="Get the latest reviews and guides."
+							buttonText="Subscribe"
+							offerType="checklist"
+							style="padding: 20px;"
+						/>
+					</aside>
+				</div>
+			</article>
+		</main>
+		<Footer />
+	</body>
+</html>

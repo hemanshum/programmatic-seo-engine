@@ -1,0 +1,133 @@
+---
+// BaseHead.astro - SEO-optimized head component with monetization support
+interface Props {
+	title?: string;
+	description?: string;
+	image?: string;
+	canonicalUrl?: string;
+	article?: {
+		publishedDate?: string;
+		modifiedDate?: string;
+		author?: string;
+		tags?: string[];
+		readingTime?: number;
+	};
+	noindex?: boolean;
+	adsenseClientId?: string;
+}
+
+const {
+	title = 'Programmatic SEO Hub',
+	description = 'Expert guides, reviews, and insights.',
+	image = '/default-og.jpg',
+	canonicalUrl,
+	article,
+	noindex = false,
+	adsenseClientId,
+} = Astro.props;
+
+const siteUrl = import.meta.env.SITE || 'https://your-programmatic-site.com';
+const ogImage = image.startsWith('http') ? image : `${siteUrl}${image}`;
+const canonical = canonicalUrl || new URL(Astro.url.pathname, siteUrl).toString();
+---
+
+<!-- Critical Meta Tags -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<meta name="generator" content={Astro.generator} />
+
+<!-- Canonical URL -->
+<link rel="canonical" href={canonical} />
+
+<!-- Robots -->
+{noindex ? (
+  <meta name="robots" content="noindex, nofollow" />
+) : (
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+  <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+)}
+
+<!-- Primary Meta Tags -->
+<title>{title}</title>
+<meta name="description" content={description} />
+<meta name="author" content={article?.author || 'Programmatic SEO Hub'} />
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content={article ? 'article' : 'website'} />
+<meta property="og:url" content={canonical} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={ogImage} />
+<meta property="og:site_name" content="Programmatic SEO Hub" />
+<meta property="og:locale" content="en_US" />
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:url" content={canonical} />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImage} />
+
+<!-- Article Meta (when applicable) -->
+{article && (
+  <>
+    <meta property="article:published_time" content={article.publishedDate} />
+    {article.modifiedDate && <meta property="article:modified_time" content={article.modifiedDate} />}
+    {article.tags?.map(tag => <meta property="article:tag" content={tag} />)}
+    <meta name="twitter:label1" content="Reading time" />
+    <meta name="twitter:data1" content={`${article.readingTime || 5} min read`} />
+  </>
+)}
+
+<!-- Structured Data: BreadcrumbList -->
+<script type="application/ld+json" set:html={JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": siteUrl
+    },
+    ...(Astro.url.pathname.startsWith('/blog/') && Astro.url.pathname !== '/blog/' ? [
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Blog",
+        "item": `${siteUrl}/blog`
+      }
+    ] : [])
+  ]
+})} />
+
+<!-- Structured Data: Organization -->
+<script type="application/ld+json" set:html={JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Programmatic SEO Hub",
+  "url": siteUrl,
+  "logo": `${siteUrl}/logo.png`,
+  "sameAs": [
+    "https://twitter.com/yourhandle",
+    "https://linkedin.com/company/yourcompany"
+  ]
+})} />
+
+<!-- AdSense (if configured) -->
+{adsenseClientId && (
+  <script
+    async
+    src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClientId}`}
+    crossorigin="anonymous"
+  />
+)}
+
+<!-- Partytown for third-party scripts -->
+<script type="text/partytown">
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'GA_MEASUREMENT_ID');
+</script>

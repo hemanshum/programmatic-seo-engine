@@ -1,0 +1,35 @@
+name: CI/CD - Build & Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build CMS
+        run: npm run build:cms
+
+      - name: Build Web
+        run: npm run build:web
+        env:
+          CMS_URL: ${{ secrets.CMS_URL }}
+          SITE: ${{ secrets.SITE_URL }}
+
+      - name: Deploy to Vercel/Netlify (optional)
+        # Add deployment steps here
+        run: echo "Add your deployment provider here"
