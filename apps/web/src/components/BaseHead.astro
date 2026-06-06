@@ -27,7 +27,8 @@ const {
 } = Astro.props;
 
 const siteUrl = import.meta.env.SITE || 'https://your-programmatic-site.com';
-const ogImage = image.startsWith('http') ? image : `${siteUrl}${image}`;
+const safeImage = typeof image === 'string' ? image : '/default-og.jpg';
+const ogImage = safeImage.startsWith('http') ? safeImage : `${siteUrl}${safeImage}`;
 const canonical = canonicalUrl || new URL(Astro.url.pathname, siteUrl).toString();
 ---
 
