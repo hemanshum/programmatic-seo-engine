@@ -2,11 +2,6 @@ import { buildConfig } from 'payload/config';
 import { postgresAdapter } from '@payloadcms/db-postgres';
 import { lexicalEditor } from '@payloadcms/richtext-lexical';
 import { webpackBundler } from '@payloadcms/bundler-webpack';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 // Collections
 import Articles from './collections/Articles.js';
@@ -16,7 +11,6 @@ import Media from './collections/Media.js';
 import Users from './collections/Users.js';
 
 export default buildConfig({
-  secret: process.env.PAYLOAD_SECRET || 'fallback-secret-change-me',
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL || 'http://localhost:3001',
   admin: {
     user: 'users',
@@ -79,12 +73,6 @@ export default buildConfig({
       connectionString: process.env.DATABASE_URI || 'postgres://localhost:5432/payload',
     },
   }),
-  typescript: {
-    outputFile: path.resolve(__dirname, 'payload-types.ts'),
-  },
-  graphQL: {
-    schemaOutputFile: path.resolve(__dirname, 'generated-schema.graphql'),
-  },
   upload: {
     limits: {
       fileSize: 5000000, // 5MB
