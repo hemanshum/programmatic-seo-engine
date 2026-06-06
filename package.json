@@ -4,13 +4,7 @@
   "description": "Programmatic SEO engine with Astro + Payload CMS",
   "private": true,
   "scripts": {
-    "install:deps": "cd apps/cms && npm install && cd ../web && npm install",
-    "build": "if [ \"$RAILWAY_SERVICE_NAME\" = \"cms\" ]; then cd apps/cms && npm run build; else cd apps/web && npm run build; fi",
-    "start": "if [ \"$RAILWAY_SERVICE_NAME\" = \"cms\" ]; then cd apps/cms && npm run start; else cd apps/web && npm run serve; fi",
-    "dev:cms": "cd apps/cms && npm run dev",
-    "dev:web": "cd apps/web && npm run dev",
-    "generate": "node scripts/generate-content.js",
-    "lint": "eslint .",
-    "format": "prettier --write ."
+    "build": "cd apps/$RAILWAY_SERVICE_NAME && npm install && npm run build",
+    "start": "cd apps/$RAILWAY_SERVICE_NAME && npm run start"
   }
 }

@@ -10,7 +10,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "serve": "npx serve dist/ -l 4321"
+    "serve": "npx serve dist/ -l 4321",
+    "start": "npx serve dist/ -l 4321"
   },
   "dependencies": {
     "@astrojs/mdx": "^6.0.2",
@@ -19,6 +20,7 @@
     "@astrojs/sitemap": "^3.7.3",
     "astro": "^6.4.4",
     "astro-seo": "^1.1.0",
+    "serve": "^14.2.4",
     "sharp": "^0.34.3"
   }
 }
