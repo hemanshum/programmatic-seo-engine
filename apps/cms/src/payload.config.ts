@@ -12,6 +12,7 @@ import Articles from './collections/Articles.js';
 import Categories from './collections/Categories.js';
 import Keywords from './collections/Keywords.js';
 import Media from './collections/Media.js';
+import Users from './collections/Users.js';
 
 export default buildConfig({
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL || 'http://localhost:3001',
@@ -24,6 +25,7 @@ export default buildConfig({
     },
   },
   collections: [
+    Users,
     Articles,
     Categories,
     Keywords,
