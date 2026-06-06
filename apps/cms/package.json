@@ -13,6 +13,7 @@
     "payload": "payload"
   },
   "dependencies": {
+    "@payloadcms/bundler-webpack": "^1.0.9",
     "@payloadcms/db-postgres": "^0.8.10",
     "@payloadcms/richtext-lexical": "^0.11.4",
     "cross-env": "^7.0.3",

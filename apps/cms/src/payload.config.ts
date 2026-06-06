@@ -1,6 +1,7 @@
 import { buildConfig } from 'payload/config';
 import { postgresAdapter } from '@payloadcms/db-postgres';
 import { lexicalEditor } from '@payloadcms/richtext-lexical';
+import { webpackBundler } from '@payloadcms/bundler-webpack';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -15,9 +16,11 @@ import Media from './collections/Media.js';
 import Users from './collections/Users.js';
 
 export default buildConfig({
+  secret: process.env.PAYLOAD_SECRET || 'fallback-secret-change-me',
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL || 'http://localhost:3001',
   admin: {
     user: 'users',
+    bundler: webpackBundler(),
     meta: {
       titleSuffix: '- Programmatic SEO CMS',
       ogImage: '/assets/seo-og.jpg',
