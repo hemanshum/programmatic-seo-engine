@@ -9,7 +9,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "serve": "npx serve dist/ -l 4321"
   },
   "dependencies": {
     "@astrojs/mdx": "^6.0.2",
